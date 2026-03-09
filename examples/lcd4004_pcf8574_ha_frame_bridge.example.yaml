@@ -1,0 +1,89 @@
+esphome:
+  name: lcd4004-ha-bridge
+  friendly_name: LCD4004 HA Bridge
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/<your-user>/<your-repo>.git
+      ref: main
+    components: [lcd4004_pcf8574]
+
+logger:
+  level: INFO
+
+api:
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+i2c:
+  sda: GPIO21
+  scl: GPIO22
+  frequency: 100kHz
+  scan: true
+
+globals:
+  - id: lcd_frame
+    type: std::string
+    initial_value: '""'
+
+text_sensor:
+  - platform: homeassistant
+    entity_id: input_text.lcd4004_frame
+    id: ha_lcd_frame
+    on_value:
+      then:
+        - lambda: |-
+            id(lcd_frame) = x;
+        - component.update: lcd
+
+display:
+  - platform: lcd4004_pcf8574
+    id: lcd
+    address: 0x27
+    dimensions: 40x4
+    update_interval: never
+    lambda: |-
+      auto split_lines = [](const std::string &s) {
+        std::vector<std::string> out;
+        std::string cur;
+        for (char c : s) {
+          if (c == '\r') continue;
+          if (c == '\n') {
+            out.push_back(cur);
+            cur.clear();
+          } else {
+            cur.push_back(c);
+          }
+        }
+        out.push_back(cur);
+        return out;
+      };
+
+      auto fix40 = [](std::string s) {
+        for (auto &c : s) {
+          if (c == '\n' || c == '\r') c = ' ';
+        }
+        if (s.size() > 40) s.resize(40);
+        if (s.size() < 40) s.append(40 - s.size(), ' ');
+        return s;
+      };
+
+      auto lines = split_lines(id(lcd_frame));
+      while (lines.size() < 4) lines.push_back("");
+
+      it.print(0, 0, fix40(lines[0]).c_str());
+      it.print(0, 1, fix40(lines[1]).c_str());
+      it.print(0, 2, fix40(lines[2]).c_str());
+      it.print(0, 3, fix40(lines[3]).c_str());

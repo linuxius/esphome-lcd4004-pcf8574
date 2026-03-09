@@ -1,0 +1,8 @@
+LCD4004 PCF8574 ESPHome component
+Copyright (c) 2026 Peter Visser
+
+Unless otherwise noted, source files in this repository are licensed under:
+GPL-3.0-or-later
+
+Some portions were adapted from ESPHome's LCD/PCF8574 implementation.
+See NOTICE.md for attribution details.

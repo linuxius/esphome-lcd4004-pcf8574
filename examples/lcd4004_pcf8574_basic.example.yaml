@@ -1,0 +1,55 @@
+esphome:
+  name: lcd4004-demo
+  friendly_name: LCD4004 Demo
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/<your-user>/<your-repo>.git
+      ref: main
+    components: [lcd4004_pcf8574]
+
+logger:
+
+api:
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "LCD4004 Fallback"
+    password: "CHANGE_ME_1234"
+
+captive_portal:
+
+i2c:
+  sda: GPIO21
+  scl: GPIO22
+  frequency: 100kHz
+  scan: true
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+display:
+  - platform: lcd4004_pcf8574
+    id: lcd
+    address: 0x27
+    dimensions: 40x4
+    update_interval: 1s
+    lambda: |-
+      auto now = id(homeassistant_time).now();
+      it.strftime(0, 0, "Time: %H:%M:%S", now);
+      it.strftime(0, 1, "Date: %Y-%m-%d", now);
+      it.print(0, 2, "LCD4004 custom");
+      it.print(0, 3, "component active");
