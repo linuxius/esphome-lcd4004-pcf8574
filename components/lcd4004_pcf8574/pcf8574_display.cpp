@@ -86,9 +86,11 @@ void PCF8574LCDDisplay::update() {
   for (uint8_t i = 0; i < this->columns_; i++)
     this->send(this->buffer_[i], true);
 
-  this->send(0x80 | 0x40, false);
-  for (uint8_t i = 0; i < this->columns_; i++)
-    this->send(this->buffer_[this->columns_ + i], true);
+  if (this->rows_ >= 2) {
+    this->send(0x80 | 0x40, false);
+    for (uint8_t i = 0; i < this->columns_; i++)
+      this->send(this->buffer_[this->columns_ + i], true);
+  }
 
   // Controller 2 (bottom): rows 2,3
   if (this->rows_ >= 3) {

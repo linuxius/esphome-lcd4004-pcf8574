@@ -14,7 +14,7 @@ ESPHome display platform for HD44780-compatible `40x4` LCDs connected via a
 
 - ESPHome external components support.
 - I2C configured in your node.
-- `40x4` LCD with PCF8574 backpack (tested target).
+- `40x4` LCD with PCF8574 backpack.
 
 ## Install
 
@@ -52,6 +52,7 @@ display:
 
 - Base options come from ESPHome `lcd_base` and `display` schemas.
 - I2C options (including `address`) come from ESPHome `i2c_device_schema`.
+- `dimensions` is validated and must be exactly `40x4`.
 - Default I2C address in this component is `0x3F`; many modules use `0x27`.
 
 ## Known Limitations

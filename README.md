@@ -8,7 +8,8 @@ through a `PCF8574` I2C backpack.
 This component has been tested on a `40x4` LCD setup with a dual-controller
 layout (top 2 rows + bottom 2 rows).
 
-Other LCD sizes and backpack pin mappings may work, but are not validated yet.
+This component now enforces `dimensions: 40x4` in schema validation.
+Other LCD sizes are not supported.
 
 ## Repository Layout
 
